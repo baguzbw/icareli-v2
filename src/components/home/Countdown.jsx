@@ -1,33 +1,47 @@
 import React, { useEffect, useState, useContext } from "react";
-import Countdown from 'react-countdown';
+import Countdown from "react-countdown";
 import { API_BASE_URL } from "../../config";
 import { MainContext } from "../../context/MainContext";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const Home = () => {
+  const { eventId } = useParams();
   const [targetDate, setTargetDate] = useState(new Date());
   const { event } = useContext(MainContext);
 
   useEffect(() => {
     const url = `${API_BASE_URL}event`;
-  
-    axios
-      .get(url)
-      .then((response) => {
-        const filteredData = response.data.filter(
-          (item) => item.id === event
-        );
-        if (filteredData.length > 0 && filteredData[0].date) {
-          // Assuming the date is in a field called 'date'
-          setTargetDate(new Date(filteredData[0].date));
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-      });
-  }, [event]);
-  
-
+    if (eventId != undefined) {
+      axios
+        .get(url)
+        .then((response) => {
+          const filteredData = response.data.filter(
+            (item) => item.id == eventId
+          );
+          if (filteredData.length > 0 && filteredData[0].date) {
+            // Assuming the date is in a field called 'date'
+            setTargetDate(new Date(filteredData[0].date));
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    } else {
+      axios
+        .get(url)
+        .then((response) => {
+          const filteredData = response.data.filter((item) => item.id == event);
+          if (filteredData.length > 0 && filteredData[0].date) {
+            // Assuming the date is in a field called 'date'
+            setTargetDate(new Date(filteredData[0].date));
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    }
+  }, [event, eventId]);
 
   const renderer = ({ days, hours, minutes, seconds, completed }) => {
     if (completed) {
@@ -53,9 +67,14 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-1/2 p-5 text-center bg-yellow-100 font-plus-jakarta" style={{ backgroundColor: '#00FF94' }}>
+    <div
+      className="flex flex-col items-center justify-center h-1/2 p-5 text-center bg-yellow-100 font-plus-jakarta"
+      style={{ backgroundColor: "#00FF94" }}
+    >
       <div className="w-1/2 flex flex-col items-center justify-center p-5 text-center">
-        <h1 className="text-4xl font-bold mb-4 p-5 font-plus-jakarta">Conference start in:</h1>
+        <h1 className="text-4xl font-bold mb-4 p-5 font-plus-jakarta">
+          Conference start in:
+        </h1>
         <Countdown date={targetDate} renderer={renderer} />
       </div>
     </div>

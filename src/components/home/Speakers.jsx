@@ -1,28 +1,43 @@
 import axios from "axios";
-import React, { useEffect, useState,useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { Link, useParams } from "react-router-dom";
 import { API_BASE_URL, API_GAMBAR_URL } from "../../config";
 import { MainContext } from "../../context/MainContext";
 
 const Speakers = () => {
   const [speakers, setSpeakers] = useState([]);
+  const { eventId } = useParams();
+
   const { event } = useContext(MainContext);
 
   useEffect(() => {
     const url = `${API_BASE_URL}speaker`;
-
-    axios
-      .get(url)
-      .then((response) => {
-        const filteredData = response.data.filter(
-          (item) => item.event === event
-        );
-        setSpeakers(filteredData);
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-      });
-  }, [event]);
+    if (eventId != undefined) {
+      axios
+        .get(url)
+        .then((response) => {
+          const filteredData = response.data.filter(
+            (item) => item.event == eventId
+          );
+          setSpeakers(filteredData);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    } else {
+      axios
+        .get(url)
+        .then((response) => {
+          const filteredData = response.data.filter(
+            (item) => item.event == event
+          );
+          setSpeakers(filteredData);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    }
+  }, [event, eventId]);
 
   return (
     <div className="container mx-auto font-plus-jakarta p-8 mb-20 text-center">
@@ -33,10 +48,15 @@ const Speakers = () => {
             <div
               className="bg-white shadow-lg rounded-3xl overflow-hidden"
               style={{
-                boxShadow: "0 0 4px #00FF94, 0 0 8px #00FF94, 0 0 12px #00FF94, 0 0 16px #00FF94",
+                boxShadow:
+                  "0 0 4px #00FF94, 0 0 8px #00FF94, 0 0 12px #00FF94, 0 0 16px #00FF94",
               }}
             >
-              <img className=" w-[320px] h-[420px] object-contain mx-auto mt-4" src={`${API_GAMBAR_URL}${speaker.gambar_speaker}`} alt={`Speaker ${index}`} />
+              <img
+                className=" w-[320px] h-[420px] object-contain mx-auto mt-4"
+                src={`${API_GAMBAR_URL}${speaker.gambar_speaker}`}
+                alt={`Speaker ${index}`}
+              />
             </div>
             <h2 className="text-xl font-semibold mt-4 mb-2">{speaker.nama}</h2>
             <p className="text-gray-600 text-sm">{speaker.instansi}</p>

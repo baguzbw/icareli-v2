@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Icareli from "./assets/IcareliUNS.svg";
-import { API_BASE_URL,API_GAMBAR_URL } from "../config";
-import { MainContext } from "../context/MainContext";
+import { API_BASE_URL } from "../config";
 
 const Navbar = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [events, setEvents] = useState([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const { setEvent } = useContext(MainContext);
-  const navigate = useNavigate();
+  const firstPath = parseInt(location.pathname.split("/")[1]);
+  const basePath = window.location.origin;
 
   useEffect(() => {
     fetch(`${API_BASE_URL}event`)
@@ -20,13 +19,10 @@ const Navbar = () => {
       .catch((err) => console.error("Error : ", err));
   }, []);
 
-  
-
-
   const limitEventName = (name) => {
-    const words = name.split(' ');
+    const words = name.split(" ");
     if (words.length >= 3) {
-      return words.slice(0, 3).join(' ');
+      return words.slice(0, 3).join(" ");
     }
     return name;
   };
@@ -34,21 +30,31 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between p-5 background-transparent">
       <Link to="/home">
-        <img src={Icareli} alt="Logo" className="h-8 w-auto sm:h-10 cursor-pointer" />
+        <img
+          src={Icareli}
+          alt="Logo"
+          className="h-8 w-auto sm:h-10 cursor-pointer"
+        />
       </Link>
       <div className="flex items-center font-bold text-black font-plus-jakarta space-x-4">
-        {["About", "Program", "Speakers", "Commitee", "News", "Contact"].map((item, index) => (
-          <Link
-            to={`/${item.toLowerCase()}`}
-            className="transition duration-200 ease-in-out transform hover:scale-105"
-            key={index}
-            onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            style={{ color: hoveredIndex === index ? "#00FF94" : "#000000" }}
-          >
-            {item}
-          </Link>
-        ))}
+        {["About", "Program", "Speakers", "Commitee", "News", "Contact"].map(
+          (item, index) => (
+            <Link
+              to={
+                Number.isNaN(firstPath)
+                  ? `/${item.toLowerCase()}`
+                  : `/${firstPath}/${item.toLowerCase()}`
+              }
+              className="transition duration-200 ease-in-out transform hover:scale-105"
+              key={index}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              style={{ color: hoveredIndex === index ? "#00FF94" : "#000000" }}
+            >
+              {item}
+            </Link>
+          )
+        )}
 
         <div className="relative group">
           <button
@@ -64,11 +70,10 @@ const Navbar = () => {
                   <button
                     onClick={() => {
                       setDropdownVisible(!dropdownVisible);
-                      setEvent(parseInt(event.id));
-                      navigate("/home");
+                      window.open(`${basePath}/${event.id}/home`, "_blank");
                     }}
                     key={event.id}
-                    className="btn block text-left p-2 px-4 m-1 rounded-full text-lg hover:bg-gray-100 transition duration-200" 
+                    className="btn block text-left p-2 px-4 m-1 rounded-full text-lg hover:bg-gray-100 transition duration-200"
                   >
                     {limitEventName(event.nama_acara)}
                   </button>
@@ -81,8 +86,11 @@ const Navbar = () => {
         <Link to="/register">
           <button
             className="text-black px-8 py-2 rounded border border-black transition duration-200 ease-in-out transform hover:scale-105"
-            onMouseEnter={() => setHoveredIndex(-1)} 
-            style={{ backgroundColor: hoveredIndex === -1 ? "#00FF94" : "#FFFFFF", borderColor: hoveredIndex === -1 ? "#FFFFFF" : "#000000" }}
+            onMouseEnter={() => setHoveredIndex(-1)}
+            style={{
+              backgroundColor: hoveredIndex === -1 ? "#00FF94" : "#FFFFFF",
+              borderColor: hoveredIndex === -1 ? "#FFFFFF" : "#000000",
+            }}
           >
             Register
           </button>

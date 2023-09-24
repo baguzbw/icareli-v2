@@ -4,28 +4,41 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { API_BASE_URL, API_GAMBAR_URL } from "../../config";
 import { MainContext } from "../../context/MainContext";
+import { useParams } from "react-router-dom";
 
 function Artikel() {
   const [currentPage, setCurrentPage] = useState(1);
   const [semuaCards, setSemuaCards] = useState([]);
   const cardsPerPage = 4;
+  const { eventId } = useParams();
   const { event } = useContext(MainContext);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}news`);
-        const filteredData = response.data.filter(
-          (item) => item.event === event
-        );
-        setSemuaCards(filteredData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (eventId != undefined) {
+        try {
+          const response = await axios.get(`${API_BASE_URL}news`);
+          const filteredData = response.data.filter(
+            (item) => item.event == eventId
+          );
+          setSemuaCards(filteredData);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      } else {
+        try {
+          const response = await axios.get(`${API_BASE_URL}news`);
+          const filteredData = response.data.filter(
+            (item) => item.event == event
+          );
+          setSemuaCards(filteredData);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     };
-
     fetchData();
-  }, [event]);
+  }, [event, eventId]);
 
   const paginate = (cards) => {
     const startIndex = (currentPage - 1) * cardsPerPage;

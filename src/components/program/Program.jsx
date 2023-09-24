@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import axios from "axios";
-import React, { useEffect, useState,useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { API_BASE_URL } from "../../config";
 import illustration from "../assets/IcareliUNS.svg";
 import illustration2 from "../assets/sdg.svg";
 import { MainContext } from "../../context/MainContext";
+import { useParams } from "react-router-dom";
 
 const Accordion = ({ title, content, link }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,14 +23,36 @@ const Accordion = ({ title, content, link }) => {
         }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div style={{ display: "flex", alignItems: "center", flex: 1, borderBottom: "2px solid", paddingBottom: "5px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+            borderBottom: "2px solid",
+            paddingBottom: "5px",
+          }}
+        >
           <span style={{ marginRight: "10px" }}>{isOpen ? "-" : "+"}</span>
           <h3 style={{ flex: 1, textAlign: "right", margin: 0 }}>{title}</h3>
         </div>
       </button>
-      <div style={{ maxHeight: isOpen ? "200px" : "0", overflow: "hidden", transition: "maxHeight 0.5s ease" }}>
+      <div
+        style={{
+          maxHeight: isOpen ? "200px" : "0",
+          overflow: "hidden",
+          transition: "maxHeight 0.5s ease",
+        }}
+      >
         <a href={link} target="_blank" rel="noopener noreferrer">
-          <button style={{ width: "100%", textAlign: "right", backgroundColor: "#00FF94" }}>{content}</button>
+          <button
+            style={{
+              width: "100%",
+              textAlign: "right",
+              backgroundColor: "#00FF94",
+            }}
+          >
+            {content}
+          </button>
         </a>
       </div>
     </div>
@@ -44,24 +67,38 @@ Accordion.propTypes = {
 
 const DescPage = () => {
   const [data, setData] = useState([]);
+  const { eventId } = useParams();
   const { event } = useContext(MainContext);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}programguide`);
-        const filteredData = response.data.filter(
-          (item) => item.event === event
-        );
-        setData(filteredData);
-        console.log(event);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (eventId != undefined) {
+        try {
+          const response = await axios.get(`${API_BASE_URL}programguide`);
+          const filteredData = response.data.filter(
+            (item) => item.event == eventId
+          );
+          setData(filteredData);
+          console.log(event);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      } else {
+        try {
+          const response = await axios.get(`${API_BASE_URL}programguide`);
+          const filteredData = response.data.filter(
+            (item) => item.event == event
+          );
+          setData(filteredData);
+          console.log(event);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     };
 
     fetchData();
-  }, []);
+  }, [event, eventId]);
 
   return (
     <div className="flex flex-col justify-between p-20 text-left font-plus-jakarta">
@@ -72,13 +109,26 @@ const DescPage = () => {
         </div>
         <div className="flex flex-col text-right justify-start p-10 text-4xl">
           {data.map((item, index) => (
-            <Accordion key={index} title={item.nama_program} content="Download File" link={item.link_program} />
+            <Accordion
+              key={index}
+              title={item.nama_program}
+              content="Download File"
+              link={item.link_program}
+            />
           ))}
         </div>
       </div>
       <div className="w-full mt-24 flex justify-center items-center">
-        <img src={illustration2} alt="Illustration" style={{ width: "auto", height: "90px", marginRight: "30px" }} />
-        <img src={illustration} alt="Illustration" style={{ width: "auto", height: "90px", marginLeft: "30px" }} />
+        <img
+          src={illustration2}
+          alt="Illustration"
+          style={{ width: "auto", height: "90px", marginRight: "30px" }}
+        />
+        <img
+          src={illustration}
+          alt="Illustration"
+          style={{ width: "auto", height: "90px", marginLeft: "30px" }}
+        />
       </div>
     </div>
   );
