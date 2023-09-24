@@ -37,6 +37,19 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/:eventId/commitee" element={<Commite />} />
+          <Route path="/:eventId/news" element={<News />} />
+          <Route
+            path="/:eventId/news/:id"
+            element={<ArticleDetail key={window.location.pathname} />}
+          />
+          <Route path="/:eventId/register" element={<Register />} />
+          <Route path="/:eventId/program" element={<Program />} />
+          <Route path="/:eventId/speakers" element={<Speakers />} />
+          <Route path="/:eventId/contact" element={<Contact />} />
+          <Route path="/:eventId/about" element={<About />} />
+          <Route path="/:eventId/home" element={<Home />} />
+          <Route path="/:eventId/" element={<Navigate to="/home" />} />
         </Routes>
         <Footer />
       </Router>
